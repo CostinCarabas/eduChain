@@ -21,3 +21,7 @@ dex/erdjs-snippets/
 contracts/**/Cargo.lock
 !contracts/**/wasm*/Cargo.lock
 contracts/**/output*/
+
+sandbox/**
+
+docs/**
