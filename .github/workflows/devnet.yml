@@ -1,0 +1,52 @@
+name: Nightly Devnet E2E
+
+on:
+  schedule:
+    - cron: "0 2 * * *"   # 02:00 UTC every night
+  workflow_dispatch:        # allow manual trigger
+
+jobs:
+  devnet_e2e:
+    name: Deploy & E2E on Devnet
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable + wasm32
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install multiversx-sc-meta
+        run: cargo install multiversx-sc-meta --locked
+
+      - name: Build WASM artefacts
+        run: |
+          for c in contracts/edu-chain-nft contracts/ect-token contracts/ect-escrow contracts/ect-anchor; do
+            (cd "$c/meta" && cargo run -- build)
+          done
+
+      - name: Build interactor binary
+        run: cargo build --release -p rust-interact
+
+      - name: Deploy all contracts to Devnet
+        env:
+          EDUCHAIN_PEM: ${{ secrets.EDUCHAIN_PEM }}
+        run: |
+          cd interactor
+          ../target/release/rust-interact deploy all
+
+      - name: Run E2E scenario
+        env:
+          EDUCHAIN_PEM: ${{ secrets.EDUCHAIN_PEM }}
+        run: |
+          cd interactor
+          ../target/release/rust-interact e2e --scenario default
+
+      - name: Upload audit log + state
+        uses: actions/upload-artifact@v4
+        with:
+          name: devnet-audit-${{ github.run_number }}
+          path: |
+            interactor/state.toml
