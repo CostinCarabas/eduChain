@@ -1,0 +1,96 @@
+{
+    "name": "ect-escrow: createSession + confirmCompletion happy path",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner":   { "nonce": "1", "balance": "0" },
+                "address:student": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": { "str:ECT-abcdef": { "balance": "1,000" } }
+                },
+                "address:mentor":  { "nonce": "0", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:ect-escrow"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/ect-escrow.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "setEctTokenId",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:ect-escrow",
+                "function": "setEctTokenId",
+                "arguments": [ "str:ECT-abcdef" ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "createSession",
+            "tx": {
+                "from": "address:student",
+                "to": "sc:ect-escrow",
+                "function": "createSession",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:ECT-abcdef",
+                        "value": "100"
+                    }
+                ],
+                "arguments": [ "address:mentor", "1999999999" ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "u64:0" ],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "confirmCompletion",
+            "tx": {
+                "from": "address:student",
+                "to": "sc:ect-escrow",
+                "function": "confirmCompletion",
+                "arguments": [ "u64:0" ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:mentor": {
+                    "esdt": {
+                        "str:ECT-abcdef": { "balance": "100" }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,47 @@
+{
+    "name": "edu-chain-nft: revokeCertificate negative — only issuer can revoke",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner":  { "nonce": "1", "balance": "1000000000000000000" },
+                "address:attacker": { "nonce": "0", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:edu-chain-nft"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/edu-chain-nft.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "revoke-not-issuer",
+            "tx": {
+                "from": "address:attacker",
+                "to": "sc:edu-chain-nft",
+                "function": "revokeCertificate",
+                "arguments": [ "1", "str:fraud" ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Caller is not an authorized issuer"
+            }
+        }
+    ]
+}

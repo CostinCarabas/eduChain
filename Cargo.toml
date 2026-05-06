@@ -1,25 +1,13 @@
-[package]
-name = "edu-chain"
-version = "0.0.0"
-edition = "2021"
-publish = false
-authors = ["you"]
-
-[lib]
-path = "src/edu_chain.rs"
-
-[dependencies.multiversx-sc]
-version = "0.56.1"
-
-[dev-dependencies]
-num-bigint = "0.4"
-
-[dev-dependencies.multiversx-sc-scenario]
-version = "0.56.1"
-
 [workspace]
 members = [
-    ".",
-    "meta",
-    "interactor"
+    "contracts/edu-chain-nft",
+    "contracts/edu-chain-nft/meta",
+    "contracts/ect-token",
+    "contracts/ect-token/meta",
+    "contracts/ect-escrow",
+    "contracts/ect-escrow/meta",
+    "contracts/ect-anchor",
+    "contracts/ect-anchor/meta",
+    "interactor",
 ]
+resolver = "2"

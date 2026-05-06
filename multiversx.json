@@ -1,3 +1,6 @@
 {
-    "language": "rust"
+    "language": "rust",
+    "projects": [
+        "contracts/*"
+    ]
 }

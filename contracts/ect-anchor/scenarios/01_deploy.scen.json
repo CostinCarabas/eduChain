@@ -1,0 +1,30 @@
+{
+    "name": "ect-anchor: deploy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": { "nonce": "1", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:ect-anchor"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/ect-anchor.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        }
+    ]
+}

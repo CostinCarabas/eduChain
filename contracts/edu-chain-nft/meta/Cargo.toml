@@ -1,10 +1,10 @@
 [package]
-name = "edu-chain-meta"
+name = "edu-chain-nft-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
-[dependencies.edu-chain]
+[dependencies.edu-chain-nft]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]

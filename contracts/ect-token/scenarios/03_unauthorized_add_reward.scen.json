@@ -1,0 +1,48 @@
+{
+    "name": "ect-token: addReward negative — unauthorized caller",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner":   { "nonce": "1", "balance": "0" },
+                "address:anyone":  { "nonce": "0", "balance": "0" },
+                "address:student": { "nonce": "0", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:ect-token"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/ect-token.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "addReward-unauthorized",
+            "tx": {
+                "from": "address:anyone",
+                "to": "sc:ect-token",
+                "function": "addReward",
+                "arguments": [ "address:student", "50", "str:hack" ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:Caller is not an authorized distributor"
+            }
+        }
+    ]
+}

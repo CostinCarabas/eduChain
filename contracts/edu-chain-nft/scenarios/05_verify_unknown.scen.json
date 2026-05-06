@@ -1,0 +1,43 @@
+{
+    "name": "edu-chain-nft: verifyCertificate — nonce 0 returns Unknown",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": { "nonce": "1", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:edu-chain-nft"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/edu-chain-nft.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scQuery",
+            "id": "verify-unknown",
+            "tx": {
+                "to": "sc:edu-chain-nft",
+                "function": "verifyCertificate",
+                "arguments": [ "u64:0" ]
+            },
+            "expect": {
+                "out": [ "u32:0" ],
+                "status": "0"
+            }
+        }
+    ]
+}

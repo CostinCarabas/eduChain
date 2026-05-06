@@ -1,0 +1,63 @@
+{
+    "name": "ect-anchor: anchor + verifyAnchor happy path",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner":  { "nonce": "1", "balance": "0" },
+                "address:author": { "nonce": "0", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:ect-anchor"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/ect-anchor.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "anchor",
+            "tx": {
+                "from": "address:author",
+                "to": "sc:ect-anchor",
+                "function": "anchor",
+                "arguments": [
+                    "0xaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd",
+                    "u32:1",
+                    "str:https://devmind.code/curricula/web3-v2.jsonld"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scQuery",
+            "id": "verifyAnchor",
+            "tx": {
+                "to": "sc:ect-anchor",
+                "function": "verifyAnchor",
+                "arguments": [
+                    "0xaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+                ]
+            },
+            "expect": {
+                "out": [ "*" ],
+                "status": "0"
+            }
+        }
+    ]
+}

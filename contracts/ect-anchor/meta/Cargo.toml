@@ -1,10 +1,10 @@
 [package]
-name = "edu-chain-meta"
+name = "ect-anchor-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
-[dependencies.edu-chain]
+[dependencies.ect-anchor]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]

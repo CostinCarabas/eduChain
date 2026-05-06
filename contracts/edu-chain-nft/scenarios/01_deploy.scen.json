@@ -1,0 +1,38 @@
+{
+    "name": "edu-chain-nft: deploy",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "1",
+                    "balance": "1000000000000000000"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:edu-chain-nft"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/edu-chain-nft.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "edu-chain-wasm"
+name = "ect-anchor-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -24,7 +24,7 @@ overflow-checks = false
 [profile.dev]
 panic = "abort"
 
-[dependencies.edu-chain]
+[dependencies.ect-anchor]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]

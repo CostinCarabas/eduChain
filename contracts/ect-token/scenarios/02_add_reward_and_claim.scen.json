@@ -1,0 +1,112 @@
+{
+    "name": "ect-token: addReward + claimRewards happy path",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner":       { "nonce": "1", "balance": "0" },
+                "address:distributor": { "nonce": "0", "balance": "0" },
+                "address:student":     { "nonce": "0", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:ect-token"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/ect-token.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:ect-token": {
+                    "storage": {
+                        "str:ectTokenId": "str:ECT-abcdef",
+                        "str:treasuryBalance": "1,000,000"
+                    },
+                    "esdt": {
+                        "str:ECT-abcdef": { "balance": "1,000,000" }
+                    }
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "addDistributor",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:ect-token",
+                "function": "addDistributor",
+                "arguments": [ "address:distributor" ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "addReward",
+            "tx": {
+                "from": "address:distributor",
+                "to": "sc:ect-token",
+                "function": "addReward",
+                "arguments": [
+                    "address:student",
+                    "50",
+                    "str:modul-1-completion"
+                ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scQuery",
+            "id": "getPendingBalance",
+            "tx": {
+                "to": "sc:ect-token",
+                "function": "getPendingBalance",
+                "arguments": [ "address:student" ]
+            },
+            "expect": {
+                "out": [ "50" ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "claimRewards",
+            "tx": {
+                "from": "address:student",
+                "to": "sc:ect-token",
+                "function": "claimRewards",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:student": {
+                    "esdt": {
+                        "str:ECT-abcdef": { "balance": "50" }
+                    }
+                }
+            }
+        }
+    ]
+}

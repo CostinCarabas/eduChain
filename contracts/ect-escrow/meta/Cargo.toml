@@ -1,10 +1,10 @@
 [package]
-name = "edu-chain-meta"
+name = "ect-escrow-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
-[dependencies.edu-chain]
+[dependencies.ect-escrow]
 path = ".."
 
 [dependencies.multiversx-sc-meta-lib]

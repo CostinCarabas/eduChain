@@ -1,0 +1,67 @@
+{
+    "name": "edu-chain-nft: verifyCertificate — revoked nonce returns Revoked status",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner":  { "nonce": "1", "balance": "1000000000000000000" },
+                "address:issuer": { "nonce": "0", "balance": "0" }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "1",
+                    "newAddress": "sc:edu-chain-nft"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "mxsc:../output/edu-chain-nft.mxsc.json",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "scCall",
+            "id": "addIssuer",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:edu-chain-nft",
+                "function": "addIssuer",
+                "arguments": [ "address:issuer" ],
+                "gasLimit": "5,000,000",
+                "gasPrice": "0"
+            },
+            "expect": { "status": "0", "gas": "*", "refund": "*" }
+        },
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:edu-chain-nft": {
+                    "storage": {
+                        "str:revokedCertificates.node_id|u64:42": "u64:42"
+                    }
+                }
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "verify-revoked",
+            "tx": {
+                "to": "sc:edu-chain-nft",
+                "function": "verifyCertificate",
+                "arguments": [ "u64:42" ]
+            },
+            "expect": {
+                "out": [ "u32:2" ],
+                "status": "0"
+            }
+        }
+    ]
+}
