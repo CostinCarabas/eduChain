@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduChain — Demo Interactiv</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #0a0e1a;
+      --surface:   #111827;
+      --surface2:  #1a2236;
+      --border:    #1e2d45;
+      --cyan:      #00d4ff;
+      --cyan-dim:  #00a8cc;
+      --green:     #22c55e;
+      --yellow:    #eab308;
+      --red:       #ef4444;
+      --blue:      #3b82f6;
+      --purple:    #a855f7;
+      --magenta:   #ec4899;
+      --text:      #e2e8f0;
+      --text-dim:  #94a3b8;
+      --text-muted:#4a5568;
+      --radius:    12px;
+      --shadow:    0 4px 24px rgba(0,0,0,0.4);
+    }
+    html { font-size: 16px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { color: var(--cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0a0e1a 0%, #0f1f3d 50%, #0a0e1a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 48px 32px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,212,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-logo {
+      font-family: 'Courier New', monospace;
+      font-size: clamp(10px, 2vw, 15px);
+      font-weight: 700;
+      color: var(--cyan);
+      line-height: 1.2;
+      letter-spacing: 1px;
+      white-space: pre;
+      text-shadow: 0 0 20px rgba(0,212,255,0.5);
+      margin-bottom: 20px;
+    }
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.3);
+      color: var(--cyan);
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 28px;
+    }
+    .hero-network {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green);
+           animation: pulse 2s infinite; }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+      50% { opacity: 0.6; box-shadow: 0 0 2px var(--green); }
+    }
+
+    /* ── Layout ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+    .section-title {
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--text); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .icon { font-size: 1.2rem; }
+
+    /* ── Contract Cards ── */
+    .contracts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .contract-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .contract-card:hover {
+      border-color: var(--cyan-dim);
+      transform: translateY(-2px);
+    }
+    .contract-card .card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .contract-card .card-name {
+      font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 4px;
+    }
+    .contract-card .card-desc {
+      font-size: 0.8rem; color: var(--text-dim); margin-bottom: 12px; line-height: 1.5;
+    }
+    .contract-card .card-addr {
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      color: var(--cyan-dim);
+      background: var(--bg);
+      padding: 6px 10px;
+      border-radius: 6px;
+      word-break: break-all;
+      margin-bottom: 10px;
+    }
+    .contract-card .card-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; color: var(--text-muted);
+    }
+    .contract-card .card-status.live { color: var(--green); }
+    .explorer-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: var(--cyan);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .explorer-btn:hover { background: rgba(0,212,255,0.15); text-decoration: none; }
+
+    /* ── Token Badge ── */
+    .token-badge {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .token-badge .token-icon { font-size: 2rem; }
+    .token-badge .token-info h3 { font-size: 1rem; color: var(--text); margin-bottom: 2px; }
+    .token-badge .token-info p { font-size: 0.82rem; color: var(--text-dim); }
+    .token-id {
+      font-family: monospace;
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+      color: var(--purple);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    /* ── Demo Steps ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .step-card:hover { border-color: rgba(0,212,255,0.3); }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .step-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+    .step-num.deploy   { background: rgba(59,130,246,0.2); color: var(--blue); border: 1px solid var(--blue); }
+    .step-num.token    { background: rgba(168,85,247,0.2); color: var(--purple); border: 1px solid var(--purple); }
+    .step-num.cert     { background: rgba(0,212,255,0.2); color: var(--cyan); border: 1px solid var(--cyan); }
+    .step-num.rewards  { background: rgba(34,197,94,0.2); color: var(--green); border: 1px solid var(--green); }
+    .step-num.escrow   { background: rgba(234,179,8,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+    .step-num.anchor   { background: rgba(236,72,153,0.2); color: var(--magenta); border: 1px solid var(--magenta); }
+    .step-num.revoke   { background: rgba(239,68,68,0.2); color: var(--red); border: 1px solid var(--red); }
+    .step-info { flex: 1; }
+    .step-info h3 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .step-info p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.4; }
+    .step-toggle {
+      color: var(--text-muted); font-size: 1.1rem;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .step-toggle.open { transform: rotate(180deg); }
+    .step-body {
+      display: none;
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .step-body.open { display: block; }
+    .step-flow {
+      margin-top: 14px;
+      padding: 14px;
+      background: var(--surface2);
+      border-radius: 8px;
+    }
+    .step-flow h4 { font-size: 0.82rem; color: var(--text-dim); margin-bottom: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+    .flow-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 6px 0;
+      font-size: 0.83rem; color: var(--text-dim);
+    }
+    .flow-item .fi-num {
+      width: 20px; height: 20px; border-radius: 50%;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .cmd-block {
+      margin-top: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--green);
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .cmd-block .cmd-comment { color: var(--text-muted); }
+    .cmd-block .cmd-bin { color: var(--cyan); }
+    .run-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(59,130,246,0.1));
+      border: 1px solid rgba(0,212,255,0.3);
+      color: var(--cyan);
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 14px;
+    }
+    .run-btn:hover {
+      background: linear-gradient(135deg, rgba(0,212,255,0.25), rgba(59,130,246,0.2));
+      border-color: var(--cyan);
+    }
+
+    /* ── Architecture Diagram ── */
+    .arch-section { margin-bottom: 40px; }
+    .arch-diagram {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      overflow-x: auto;
+    }
+    .arch-inner {
+      min-width: 700px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .arch-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .arch-box {
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 18px;
+      text-align: center;
+      min-width: 130px;
+      transition: border-color 0.2s;
+    }
+    .arch-box:hover { border-color: var(--cyan-dim); }
+    .arch-box .ab-icon { font-size: 1.4rem; margin-bottom: 4px; }
+    .arch-box .ab-name { font-size: 0.83rem; font-weight: 700; color: var(--text); }
+    .arch-box .ab-sub  { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .arch-box.highlight { border-color: var(--cyan); background: rgba(0,212,255,0.05); }
+    .arch-box.green-box { border-color: var(--green); background: rgba(34,197,94,0.05); }
+    .arch-box.purple-box { border-color: var(--purple); background: rgba(168,85,247,0.05); }
+    .arch-box.yellow-box { border-color: var(--yellow); background: rgba(234,179,8,0.05); }
+    .arch-box.pink-box { border-color: var(--magenta); background: rgba(236,72,153,0.05); }
+    .arch-arrow {
+      color: var(--text-muted); font-size: 1.2rem; flex-shrink: 0;
+    }
+    .arch-label {
+      font-size: 0.75rem; color: var(--text-dim);
+      text-align: center; padding: 6px 14px;
+      background: var(--bg); border-radius: 6px;
+      border: 1px dashed var(--border);
+    }
+
+    /* ── Terminal ── */
+    .terminal-section { margin-bottom: 40px; }
+    .terminal {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .terminal-bar {
+      background: var(--surface2);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .terminal-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .td-red    { background: #ff5f56; }
+    .td-yellow { background: #ffbd2e; }
+    .td-green  { background: #27c93f; }
+    .terminal-title {
+      margin-left: 8px;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      font-family: monospace;
+    }
+    .terminal-body {
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      line-height: 1.7;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .t-cyan    { color: var(--cyan); }
+    .t-green   { color: var(--green); }
+    .t-yellow  { color: var(--yellow); }
+    .t-red     { color: var(--red); }
+    .t-dim     { color: var(--text-muted); }
+    .t-white   { color: var(--text); }
+    .t-bold    { font-weight: 700; }
+    .t-magenta { color: var(--magenta); }
+
+    /* ── Quick Actions ── */
+    .actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .action-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: block;
+    }
+    .action-btn:hover {
+      border-color: var(--cyan-dim);
+      background: var(--surface2);
+      text-decoration: none;
+    }
+    .action-btn .ab-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .action-btn .ab-label { font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .action-btn .ab-sub { font-size: 0.75rem; color: var(--text-dim); }
+
+    /* ── Setup ── */
+    .setup-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 40px;
+    }
+    .setup-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; color: var(--yellow); }
+    .setup-step {
+      display: flex; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .setup-step:last-child { border-bottom: none; }
+    .setup-step .ss-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(234,179,8,0.15);
+      border: 1px solid var(--yellow);
+      color: var(--yellow); font-weight: 700; font-size: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .setup-step .ss-text { color: var(--text-dim); line-height: 1.5; }
+    .setup-step code {
+      font-family: monospace;
+      background: var(--bg);
+      color: var(--cyan);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.82em;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .tab-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover { border-color: var(--cyan-dim); color: var(--text); }
+    .tab-btn.active {
+      background: rgba(0,212,255,0.1);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .hero { padding: 32px 16px 28px; }
+      .hero-logo { font-size: 8px; }
+      .container { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════════════ -->
+<header class="hero">
+  <div class="hero-logo">  ███████╗██████╗ ██╗   ██╗ ██████╗██╗  ██╗ █████╗ ██╗███╗   ██╗
+  ██╔════╝██╔══██╗██║   ██║██╔════╝██║  ██║██╔══██╗██║████╗  ██║
+  █████╗  ██║  ██║██║   ██║██║     ███████║███████║██║██╔██╗ ██║
+  ██╔══╝  ██║  ██║██║   ██║██║     ██╔══██║██╔══██║██║██║╚██╗██║
+  ███████╗██████╔╝╚██████╔╝╚██████╗██║  ██║██║  ██║██║██║ ╚████║
+  ╚══════╝╚═════╝  ╚═════╝  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝</div>
+  <p class="hero-subtitle">Blockchain-powered Educational Certificate System</p>
+  <div class="hero-badge">TRL-4 Etapa 2 — Demo Devnet MultiversX</div>
+  <div class="hero-network">
+    <span class="dot"></span>
+    <span>Devnet Live — devnet-explorer.multiversx.com</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════════════════════ -->
+<main class="container">
+
+  <!-- ── Tabs ── -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('contracts')">📦 Contracte</button>
+    <button class="tab-btn" onclick="showTab('demo')">▶ Demo Pași</button>
+    <button class="tab-btn" onclick="showTab('arch')">🏗 Arhitectură</button>
+    <button class="tab-btn" onclick="showTab('setup')">⚙ Setup</button>
+  </div>
+
+  <!-- ════════ TAB: Contracte ════════ -->
+  <div id="tab-contracts" class="tab-content">
+
+    <!-- Contract Cards -->
+    <div class="section-title">
+      <span class="icon">📦</span> Contracte Deployate pe Devnet
+    </div>
+
+    <div class="contracts-grid">
+
+      <div class="contract-card" onclick="openExplorer('accounts','erd1qqqqqqqqqqqqqpgqtgc2tn999va6cpmgujcv3jk4dt7wgam3lmpq6qakvu')">
+        <div class="card-icon">🎓</div>
+        <div class="card-name">edu-chain-nft</div>
+        <div class="card-desc">Emitere certificate SBT (Soulbound Token) cu hash SHA-256 al metadatelor stocat on-chain</div>
+        <div class="card-addr">erd1qqqqqqqqqqqqqpgqtgc2tn999va6cpmgujcv3jk4dt7wgam3lmpq6qakvu</div>
+        <div class="card-status live">● Deployed — Devnet</div>
+        <a class="explorer-btn" href="https://devnet-explorer.multiversx.com/accounts/erd1qqqqqqqqqqqqqpgqtgc2tn999va6cpmgujcv3jk4dt7wgam3lmpq6qakvu" target="_blank" onclick="event.stopPropagation()">
+          🔗 Explorer
+        </a>
+      </div>
+
+      <div class="contract-card" onclick="openExplorer('accounts','erd1qqqqqqqqqqqqqpgqvyz832uc7pfan2usyqq8ek9k8vf7xhtvlmpqsf73v7')">
+        <div class="card-icon">🪙</div>
+        <div class="card-name">ect-token</div>
+        <div class="card-desc">Token fungibil $ECT (EduChain Token) — trezorerie, distribuție recompense, sistem de claim</div>
+        <div class="card-addr">erd1qqqqqqqqqqqqqpgqvyz832uc7pfan2usyqq8ek9k8vf7xhtvlmpqsf73v7</div>
+        <div class="card-status live">● Deployed — Devnet</div>
+        <a class="explorer-btn" href="https://devnet-explorer.multiversx.com/accounts/erd1qqqqqqqqqqqqqpgqvyz832uc7pfan2usyqq8ek9k8vf7xhtvlmpqsf73v7" target="_blank" onclick="event.stopPropagation()">
+          🔗 Explorer
+        </a>
+      </div>
+
+      <div class="contract-card" onclick="openExplorer('accounts','erd1qqqqqqqqqqqqqpgq08hh9e5t57llh8p300hfdneqlxj80shzlmpq4f6qd6')">
+        <div class="card-icon">🤝</div>
+        <div class="card-name">ect-escrow</div>
+        <div class="card-desc">Sesiuni de mentoring cu fonduri ECT blocate în escrow — eliberate la confirmare</div>
+        <div class="card-addr">erd1qqqqqqqqqqqqqpgq08hh9e5t57llh8p300hfdneqlxj80shzlmpq4f6qd6</div>
+        <div class="card-status live">● Deployed — Devnet</div>
+        <a class="explorer-btn" href="https://devnet-explorer.multiversx.com/accounts/erd1qqqqqqqqqqqqqpgq08hh9e5t57llh8p300hfdneqlxj80shzlmpq4f6qd6" target="_blank" onclick="event.stopPropagation()">
+          🔗 Explorer
+        </a>
+      </div>
+
+      <div class="contract-card" onclick="openExplorer('accounts','erd1qqqqqqqqqqqqqpgqcy8ws6k9fthwfa9g67ksynvcfen7rdmglmpqpc7cl7')">
+        <div class="card-icon">⚓</div>
+        <div class="card-name">ect-anchor</div>
+        <div class="card-desc">Registru imutabil de hash-uri SHA-256 ale documentelor — dovadă de existență on-chain</div>
+        <div class="card-addr">erd1qqqqqqqqqqqqqpgqcy8ws6k9fthwfa9g67ksynvcfen7rdmglmpqpc7cl7</div>
+        <div class="card-status live">● Deployed — Devnet</div>
+        <a class="explorer-btn" href="https://devnet-explorer.multiversx.com/accounts/erd1qqqqqqqqqqqqqpgqcy8ws6k9fthwfa9g67ksynvcfen7rdmglmpqpc7cl7" target="_blank" onclick="event.stopPropagation()">
+          🔗 Explorer
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Token Badge -->
+    <div class="token-badge">
+      <div class="token-icon">🟣</div>
+      <div class="token-info">
+        <h3>Token $ECT — EduChain Token</h3>
+        <p>Token ESDT fungibil pe MultiversX · Supply inițial: 10,000,000 ECT</p>
+        <a href="https://devnet-explorer.multiversx.com/tokens/ECT-f90acc" target="_blank" class="explorer-btn" style="margin-top:8px; display:inline-flex;">🔗 Explorer Token</a>
+      </div>
+      <div class="token-id">ECT-f90acc</div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-title"><span class="icon">🔗</span> Linkuri Rapide Explorer</div>
+    <div class="actions-grid">
+      <a class="action-btn" href="https://devnet-explorer.multiversx.com" target="_blank">
+        <div class="ab-icon">🌐</div>
+        <div class="ab-label">Devnet Explorer</div>
+        <div class="ab-sub">devnet-explorer.multiversx.com</div>
+      </a>
+      <a class="action-btn" href="https://devnet-explorer.multiversx.com/tokens/ECT-f90acc" target="_blank">
+        <div class="ab-icon">🪙</div>
+        <div class="ab-label">Token ECT-f90acc</div>
+        <div class="ab-sub">Holders, transferuri, metadate</div>
+      </a>
+      <a class="action-btn" href="https://devnet-explorer.multiversx.com/nfts/EDUCERT-174aad-01/transactions" target="_blank">
+        <div class="ab-icon">🎓</div>
+        <div class="ab-label">NFT-uri Certificate</div>
+        <div class="ab-sub">Colecție EDUCERT emise</div>
+      </a>
+      <a class="action-btn" href="https://devnet-explorer.multiversx.com/accounts/erd1c3umcqd2f8fx9q605vtqtm3pu8zawac3l96cmrnc35h7uzgvlmpqm3zsnr" target="_blank">
+        <div class="ab-icon">🔑</div>
+        <div class="ab-label">Wallet Operator</div>
+        <div class="ab-sub">erd1c3um...zsnr</div>
+      </a>
+    </div>
+
+  </div>
+
+  <!-- ════════ TAB: Demo Pași ════════ -->
+  <div id="tab-demo" class="tab-content" style="display:none;">
+
+    <div class="section-title"><span class="icon">▶</span> Pașii Demo — Flux Complet</div>
+
+    <!-- Terminal live simulation -->
+    <div class="terminal-section">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot td-red"></div>
+          <div class="terminal-dot td-yellow"></div>
+          <div class="terminal-dot td-green"></div>
+          <span class="terminal-title">demo/demo.sh — EduChain Interactor</span>
+        </div>
+        <div class="terminal-body" id="terminal-output">
+<span class="t-cyan t-bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="t-cyan t-bold">  EduChain PoC — Demo interactiv (Devnet MultiversX)</span>
+<span class="t-cyan t-bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+<span class="t-dim">  Contracte demonstrate:</span>
+<span class="t-green">●</span> <span class="t-white">edu-chain-nft  — Emitere certificate SBT</span>
+<span class="t-green">●</span> <span class="t-white">ect-token       — Token de recompensă $ECT</span>
+<span class="t-green">●</span> <span class="t-white">ect-escrow      — Sesiuni de mentoring cu escrow</span>
+<span class="t-green">●</span> <span class="t-white">ect-anchor      — Ancorare hash-uri de conținut</span>
+
+<span class="t-dim">  Apasă un pas din lista de mai jos pentru a vedea detaliile →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step Cards -->
+    <div class="steps-grid">
+
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num deploy">1</div>
+          <div class="step-info">
+            <h3>Deploy toate contractele pe Devnet</h3>
+            <p>Construiește WASM-urile și deployează toate 4 contracte smart pe MultiversX Devnet</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux de execuție</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Build artefacte WASM pentru edu-chain-nft, ect-token, ect-escrow, ect-anchor</div>
+            <div class="flow-item"><div class="fi-num">2</div>Deploy edu-chain-nft → stochează adresa în state.toml</div>
+            <div class="flow-item"><div class="fi-num">3</div>Deploy ect-token → crează contractul de trezorerie ECT</div>
+            <div class="flow-item"><div class="fi-num">4</div>Deploy ect-escrow → configurează escrow-ul pentru sesiuni mentoring</div>
+            <div class="flow-item"><div class="fi-num">5</div>Deploy ect-anchor → registru imutabil de hash-uri</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-comment"># Mod automat (fără pauze interactive):</span>
+AUTO=1 ./demo/demo.sh 1
+
+<span class="cmd-comment"># Sau cu skip deploy (contracte deja existente):</span>
+SKIP_DEPLOY=1 ./demo/demo.sh a
+
+<span class="cmd-comment"># Binary interactor:</span>
+<span class="cmd-bin">rust-interact</span> deploy nft
+<span class="cmd-bin">rust-interact</span> deploy token
+<span class="cmd-bin">rust-interact</span> deploy escrow
+<span class="cmd-bin">rust-interact</span> deploy anchor
+          </div>
+          <button class="run-btn" onclick="simulateStep(1)">▶ Simulează output</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num token">2</div>
+          <div class="step-info">
+            <h3>Emitere token $ECT și inițializare trezorerie</h3>
+            <p>Emite token-ul fungibil EduChain Token prin sistemul ESDT MultiversX și mint-ează recompensele inițiale</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux de execuție</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Emite token ESDT "EduChainToken" cu ticker ECT — costă 0.05 EGLD, durează ~5s</div>
+            <div class="flow-item"><div class="fi-num">2</div>Mint 1,000,000 ECT recompense inițiale în trezorerie</div>
+            <div class="flow-item"><div class="fi-num">3</div>Verifică soldul trezoreriei on-chain</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-bin">rust-interact</span> token issue --name EduChainToken --ticker ECT --supply 10000000
+<span class="cmd-bin">rust-interact</span> token mint-rewards --amount 1000000
+<span class="cmd-bin">rust-interact</span> token treasury-balance
+          </div>
+          <button class="run-btn" onclick="simulateStep(2)">▶ Simulează output</button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num cert">3</div>
+          <div class="step-info">
+            <h3>Emitere certificat NFT (SBT) pentru student</h3>
+            <p>Emite un certificat Soulbound Token cu hash SHA-256 al metadatelor stocat imutabil on-chain</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux de emitere certificat</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Citire fixture JSON (cert1.json) — date student, curs, instituție</div>
+            <div class="flow-item"><div class="fi-num">2</div>Citire metadata JSON-LD off-chain și canonicalizare (chei sortate)</div>
+            <div class="flow-item"><div class="fi-num">3</div>Calcul SHA-256 al JSON-LD canonic → content_hash unic</div>
+            <div class="flow-item"><div class="fi-num">4</div>Construire CertificateAttributes cu content_hash + date student</div>
+            <div class="flow-item"><div class="fi-num">5</div>Trimitere tranzacție issueCertificate pe Devnet → confirmare blockchain</div>
+            <div class="flow-item"><div class="fi-num">6</div>NFT (SBT) transferat automat în wallet-ul studentului</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-comment"># Inițializare colecție NFT (prima dată):</span>
+<span class="cmd-bin">rust-interact</span> nft issue-token --name EduCert --ticker EDUCERT
+<span class="cmd-bin">rust-interact</span> nft set-local-roles
+<span class="cmd-bin">rust-interact</span> nft add-issuer --addr &lt;operator&gt;
+
+<span class="cmd-comment"># Emitere certificat din fixture:</span>
+<span class="cmd-bin">rust-interact</span> nft issue --cert-file fixtures/cert1.json
+
+<span class="cmd-comment"># Verificare atribute on-chain:</span>
+<span class="cmd-bin">rust-interact</span> nft verify --nonce 1
+          </div>
+          <button class="run-btn" onclick="simulateStep(3)">▶ Simulează output</button>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num rewards">4</div>
+          <div class="step-info">
+            <h3>Distribuire recompense $ECT către student</h3>
+            <p>Adaugă recompense ECT pentru student (absolvire) și permite claim-ul fondurilor</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux recompense</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Înregistrare operator ca distribuitor autorizat de recompense</div>
+            <div class="flow-item"><div class="fi-num">2</div>Adaugă 500 ECT în pending pentru adresa studentului (motiv: "absolvire")</div>
+            <div class="flow-item"><div class="fi-num">3</div>Verifică soldul pending al studentului on-chain</div>
+            <div class="flow-item"><div class="fi-num">4</div>Studentul execută claim → ECT transferați în wallet</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-bin">rust-interact</span> token add-distributor --addr &lt;operator&gt;
+<span class="cmd-bin">rust-interact</span> token add-reward --to &lt;student&gt; --amount 500 --reason "absolvire"
+<span class="cmd-bin">rust-interact</span> token pending-balance --address &lt;student&gt;
+<span class="cmd-bin">rust-interact</span> token claim
+          </div>
+          <button class="run-btn" onclick="simulateStep(4)">▶ Simulează output</button>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num escrow">5</div>
+          <div class="step-info">
+            <h3>Sesiune de mentoring cu escrow $ECT</h3>
+            <p>Student plătește 200 ECT blocați în escrow — eliberați mentorului după confirmare</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux escrow mentoring</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Student creează sesiunea → 200 ECT blocați în smart contract escrow</div>
+            <div class="flow-item"><div class="fi-num">2</div>Sesiunea rămâne în stare "Open" pe durata mentoring-ului (deadline: 72h)</div>
+            <div class="flow-item"><div class="fi-num">3</div>Student confirmă finalizarea sesiunii on-chain</div>
+            <div class="flow-item"><div class="fi-num">4</div>200 ECT eliberați automat în wallet-ul mentorului → stare "Completed"</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-bin">rust-interact</span> escrow set-token-id
+<span class="cmd-bin">rust-interact</span> escrow create --mentor &lt;mentor_addr&gt; --amount 200 --deadline-hours 72
+<span class="cmd-bin">rust-interact</span> escrow get-session --id 0
+<span class="cmd-bin">rust-interact</span> escrow confirm --id 0
+<span class="cmd-bin">rust-interact</span> escrow get-session --id 0
+          </div>
+          <button class="run-btn" onclick="simulateStep(5)">▶ Simulează output</button>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num anchor">6</div>
+          <div class="step-info">
+            <h3>Ancorare hash document pe blockchain</h3>
+            <p>Calculează SHA-256 al raportului de validare TRL-4 și îl stochează imutabil on-chain</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux ancorare</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Calcul SHA-256 al fișierului local (EduChain_TRL4_E2_Validation_Report.md)</div>
+            <div class="flow-item"><div class="fi-num">2</div>Trimitere hash (32 bytes) + URI pe blockchain — stocat cu autor, timestamp</div>
+            <div class="flow-item"><div class="fi-num">3</div>Verificare ancorei pe blockchain (hash → metadata)</div>
+            <div class="flow-item"><div class="fi-num">4</div>Test duplicat → contractul respinge anchore duplicate (imutabilitate)</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-bin">rust-interact</span> anchor put --file ../docs/EduChain_TRL4_E2_Validation_Report.md
+<span class="cmd-comment"># → Hash SHA-256: a3f8c2... stocat on-chain cu timestamp</span>
+
+<span class="cmd-bin">rust-interact</span> anchor verify --hex &lt;sha256_hash&gt;
+<span class="cmd-comment"># → anchor_contract returnează: autor, timestamp, URI, revoked=false</span>
+
+<span class="cmd-comment"># Test de idempotență (trebuie să eșueze):</span>
+<span class="cmd-bin">rust-interact</span> anchor put --file ../docs/EduChain_TRL4_E2_Validation_Report.md
+<span class="cmd-comment"># ✔ Contractul a respins corect hash-ul duplicat!</span>
+          </div>
+          <button class="run-btn" onclick="simulateStep(6)">▶ Simulează output</button>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step-card">
+        <div class="step-header" onclick="toggleStep(this)">
+          <div class="step-num revoke">7</div>
+          <div class="step-info">
+            <h3>Revocare certificat (soft revoke)</h3>
+            <p>Marchează certificatul ca revocat on-chain — NFT rămâne în wallet, statusul devine "Revoked"</p>
+          </div>
+          <div class="step-toggle">▾</div>
+        </div>
+        <div class="step-body">
+          <div class="step-flow">
+            <h4>Flux revocare</h4>
+            <div class="flow-item"><div class="fi-num">1</div>Emitent apelează revokeCertificate cu nonce + motiv</div>
+            <div class="flow-item"><div class="fi-num">2</div>Smart contract actualizează statusul NFT-ului → "Revoked"</div>
+            <div class="flow-item"><div class="fi-num">3</div>NFT rămâne în wallet-ul studentului (Soulbound — non-transferabil)</div>
+            <div class="flow-item"><div class="fi-num">4</div>Orice verificare ulterioară returnează status=Revoked + motiv + timestamp</div>
+          </div>
+          <div class="cmd-block">
+<span class="cmd-bin">rust-interact</span> nft revoke --nonce 1 --reason "date eronate"
+<span class="cmd-comment"># ✔ Tranzacție confirmată pe Devnet</span>
+
+<span class="cmd-bin">rust-interact</span> nft verify --nonce 1
+<span class="cmd-comment"># → status: Revoked | motiv: date eronate | timestamp: ...</span>
+          </div>
+          <button class="run-btn" onclick="simulateStep(7)">▶ Simulează output</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Run All -->
+    <div style="text-align:center; margin-bottom: 32px;">
+      <button class="run-btn" style="font-size:1rem; padding:14px 32px;" onclick="simulateAll()">
+        ▶ Rulează toți pașii (simulare)
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ════════ TAB: Arhitectură ════════ -->
+  <div id="tab-arch" class="tab-content" style="display:none;">
+    <div class="section-title"><span class="icon">🏗</span> Arhitectura Sistemului EduChain</div>
+
+    <div class="arch-section">
+      <div class="arch-diagram">
+        <div class="arch-inner">
+
+          <!-- Layer 1: Actori -->
+          <div class="arch-row">
+            <div class="arch-box">
+              <div class="ab-icon">🏫</div>
+              <div class="ab-name">Instituție</div>
+              <div class="ab-sub">Operator / Emitent</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-box">
+              <div class="ab-icon">🎓</div>
+              <div class="ab-name">Student</div>
+              <div class="ab-sub">Wallet MultiversX</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-box">
+              <div class="ab-icon">👨‍🏫</div>
+              <div class="ab-name">Mentor</div>
+              <div class="ab-sub">Sesiuni plătite ECT</div>
+            </div>
+            <div class="arch-arrow">→</div>
+            <div class="arch-box">
+              <div class="ab-icon">🔍</div>
+              <div class="ab-name">Verificator</div>
+              <div class="ab-sub">Angajator / Terț</div>
+            </div>
+          </div>
+
+          <div style="color:var(--text-muted); font-size:1.5rem;">↓ ↓ ↓ ↓</div>
+
+          <!-- Layer 2: Interactor -->
+          <div class="arch-row">
+            <div class="arch-box highlight" style="min-width:280px;">
+              <div class="ab-icon">⚙️</div>
+              <div class="ab-name">rust-interact</div>
+              <div class="ab-sub">CLI Interactor Rust · MultiversX SDK</div>
+            </div>
+          </div>
+
+          <div style="color:var(--text-muted); font-size:1.5rem;">↓</div>
+
+          <!-- Layer 3: MultiversX -->
+          <div class="arch-label" style="width:100%; max-width:650px;">
+            🌐 MultiversX Devnet — gateway: devnet-gateway.multiversx.com
+          </div>
+
+          <!-- Layer 4: Smart Contracts -->
+          <div class="arch-row">
+            <div class="arch-box highlight">
+              <div class="ab-icon">🎓</div>
+              <div class="ab-name">edu-chain-nft</div>
+              <div class="ab-sub">SBT Certificate<br/>SHA-256 on-chain</div>
+            </div>
+            <div class="arch-box purple-box">
+              <div class="ab-icon">🪙</div>
+              <div class="ab-name">ect-token</div>
+              <div class="ab-sub">ESDT $ECT<br/>Trezorerie + Rewards</div>
+            </div>
+            <div class="arch-box yellow-box">
+              <div class="ab-icon">🤝</div>
+              <div class="ab-name">ect-escrow</div>
+              <div class="ab-sub">Mentoring Sessions<br/>Funds Lock → Release</div>
+            </div>
+            <div class="arch-box pink-box">
+              <div class="ab-icon">⚓</div>
+              <div class="ab-name">ect-anchor</div>
+              <div class="ab-sub">Hash Registry<br/>Proof of Existence</div>
+            </div>
+          </div>
+
+          <div style="color:var(--text-muted); font-size:1.5rem;">↓</div>
+
+          <!-- Layer 5: Storage -->
+          <div class="arch-row">
+            <div class="arch-box green-box" style="min-width:200px;">
+              <div class="ab-icon">⛓</div>
+              <div class="ab-name">Blockchain State</div>
+              <div class="ab-sub">Imutabil · Transparent · Auditabil</div>
+            </div>
+            <div class="arch-arrow">+</div>
+            <div class="arch-box" style="min-width:200px;">
+              <div class="ab-icon">📄</div>
+              <div class="ab-name">Off-chain Storage</div>
+              <div class="ab-sub">JSON-LD Metadata · IPFS / DB</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- What's stored on-chain -->
+    <div class="section-title"><span class="icon">🔐</span> Ce este stocat On-Chain</div>
+    <div class="contracts-grid">
+      <div class="contract-card" style="cursor:default;">
+        <div class="card-icon">🔑</div>
+        <div class="card-name">edu-chain-nft</div>
+        <div class="card-desc">
+          SHA-256 hash al metadatelor · Status certificat (Valid/Revoked) · Adresa studentului ·
+          Nonce NFT · Timestamp emitere · Motiv revocare (dacă există)
+        </div>
+      </div>
+      <div class="contract-card" style="cursor:default;">
+        <div class="card-icon">🔑</div>
+        <div class="card-name">ect-token</div>
+        <div class="card-desc">
+          Sold trezorerie ECT · Recompense pending per student ·
+          Lista distribuitori autorizați · Total ECT emis · Istoricul claim-urilor
+        </div>
+      </div>
+      <div class="contract-card" style="cursor:default;">
+        <div class="card-icon">🔑</div>
+        <div class="card-name">ect-escrow</div>
+        <div class="card-desc">
+          ID sesiune · Adrese student + mentor · Suma ECT blocată ·
+          Deadline UNIX · Status sesiune (Open/Completed/Expired/Cancelled)
+        </div>
+      </div>
+      <div class="contract-card" style="cursor:default;">
+        <div class="card-icon">🔑</div>
+        <div class="card-name">ect-anchor</div>
+        <div class="card-desc">
+          SHA-256 hash document · Adresa autorului · Timestamp blockchain ·
+          URI document · Status (revoked=false/true) · Imutabilitate garantată
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ════════ TAB: Setup ════════ -->
+  <div id="tab-setup" class="tab-content" style="display:none;">
+
+    <div class="section-title"><span class="icon">⚙</span> Setup pentru Demo</div>
+
+    <div class="setup-box">
+      <h3>⚠ Pași obligatorii înainte de demo</h3>
+
+      <div class="setup-step">
+        <div class="ss-num">1</div>
+        <div class="ss-text">
+          <strong>Configurează variabila PEM:</strong><br/>
+          <code>export EDUCHAIN_PEM="$(cat ~/wallets/devnet_operator.pem)"</code><br/>
+          Cheia privată a operatorului pe Devnet MultiversX (NU o commite în git!)
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="ss-num">2</div>
+        <div class="ss-text">
+          <strong>Compilează binarul interactor:</strong><br/>
+          <code>cd eduChain-PoC && cargo build --release -p rust-interact</code><br/>
+          Binarul va fi la: <code>target/release/rust-interact</code>
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="ss-num">3</div>
+        <div class="ss-text">
+          <strong>Verifică conexiunea Devnet:</strong><br/>
+          <code>curl https://devnet-gateway.multiversx.com/about</code><br/>
+          Trebuie să returneze info despre rețea (acces internet necesar)
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="ss-num">4</div>
+        <div class="ss-text">
+          <strong>Rulează demo-ul:</strong><br/>
+          <code>chmod +x demo/demo.sh</code><br/>
+          <code>./demo/demo.sh</code>  — mod interactiv (cu pauze)<br/>
+          <code>AUTO=1 ./demo/demo.sh a</code>  — mod automat, toți pașii<br/>
+          <code>SKIP_DEPLOY=1 ./demo/demo.sh a</code>  — sare deploy (contracte deja existente)
+        </div>
+      </div>
+
+      <div class="setup-step">
+        <div class="ss-num">5</div>
+        <div class="ss-text">
+          <strong>Demo pas individual:</strong><br/>
+          <code>./demo/demo.sh 3</code>  — rulează doar Pasul 3 (emitere certificat)<br/>
+          <code>./demo/demo.sh 6</code>  — rulează doar Pasul 6 (ancorare hash)
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Config Info -->
+    <div class="section-title"><span class="icon">📋</span> Configurație curentă (state.toml)</div>
+    <div class="cmd-block">
+<span class="cmd-comment"># interactor/state.toml — adrese deployate pe Devnet:</span>
+nft_contract    = "erd1qqqqqqqqqqqqqpgqtgc2tn999va6cpmgujcv3jk4dt7wgam3lmpq6qakvu"
+token_contract  = "erd1qqqqqqqqqqqqqpgqvyz832uc7pfan2usyqq8ek9k8vf7xhtvlmpqsf73v7"
+escrow_contract = "erd1qqqqqqqqqqqqqpgq08hh9e5t57llh8p300hfdneqlxj80shzlmpq4f6qd6"
+anchor_contract = "erd1qqqqqqqqqqqqqpgqcy8ws6k9fthwfa9g67ksynvcfen7rdmglmpqpc7cl7"
+ect_token_id    = "ECT-f90acc"
+
+<span class="cmd-comment"># interactor/config.toml:</span>
+chain_type  = "real"
+gateway_uri = "https://devnet-gateway.multiversx.com"
+    </div>
+
+    <div class="section-title" style="margin-top:32px;"><span class="icon">🔗</span> Resurse utile</div>
+    <div class="actions-grid">
+      <a class="action-btn" href="https://devnet-explorer.multiversx.com" target="_blank">
+        <div class="ab-icon">🌐</div>
+        <div class="ab-label">Devnet Explorer</div>
+        <div class="ab-sub">Explorează tranzacții și contracte</div>
+      </a>
+      <a class="action-btn" href="https://devnet-gateway.multiversx.com/about" target="_blank">
+        <div class="ab-icon">🔌</div>
+        <div class="ab-label">Devnet Gateway</div>
+        <div class="ab-sub">API endpoint pentru interactor</div>
+      </a>
+      <a class="action-btn" href="https://docs.multiversx.com" target="_blank">
+        <div class="ab-icon">📚</div>
+        <div class="ab-label">Docs MultiversX</div>
+        <div class="ab-sub">Documentație oficială</div>
+      </a>
+      <a class="action-btn" href="https://faucet.multiversx.com" target="_blank">
+        <div class="ab-icon">💧</div>
+        <div class="ab-label">Devnet Faucet</div>
+        <div class="ab-sub">EGLD gratuit pentru testing</div>
+      </a>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  <p>EduChain PoC — TRL-4 Etapa 2 · MultiversX Devnet ·
+  <a href="https://devnet-explorer.multiversx.com" target="_blank">devnet-explorer.multiversx.com</a></p>
+</footer>
+
+<script>
+// ── Tab switching ──
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  event.target.classList.add('active');
+}
+
+// ── Step accordion ──
+function toggleStep(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.step-toggle');
+  const isOpen = body.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.step-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.step-toggle').forEach(t => t.classList.remove('open'));
+  // Open this one if it was closed
+  if (!isOpen) {
+    body.classList.add('open');
+    toggle.classList.add('open');
+  }
+}
+
+// ── Explorer link ──
+function openExplorer(type, addr) {
+  window.open('https://devnet-explorer.multiversx.com/' + type + '/' + addr, '_blank');
+}
+
+// ── Terminal simulation ──
+const stepOutputs = {
+  1: [
+    ['t-cyan t-bold', '▶ Pasul 1 — Deploy toate contractele pe Devnet'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Construiesc artefactele WASM pentru toate contractele...'],
+    ['t-dim', '  Building contracts/edu-chain-nft...'],
+    ['t-dim', '  Building contracts/ect-token...'],
+    ['t-dim', '  Building contracts/ect-escrow...'],
+    ['t-dim', '  Building contracts/ect-anchor...'],
+    ['t-green', '✔  WASM-uri construite'],
+    ['t-blue', 'ℹ  Deploy edu-chain-nft (certificatul SBT)...'],
+    ['t-dim', '$ cd interactor && rust-interact deploy nft'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Deploy ect-token (token fungibil $ECT)...'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Deploy ect-escrow (escrow sesiuni mentoring)...'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Deploy ect-anchor (registru hash-uri de conținut)...'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-green t-bold', '✔  Toate 4 contracte au fost deployate!'],
+    ['t-dim', 'nft_contract    = "erd1qqqqqqqqqqqqqpgqtgc2tn999va6cpmgujcv3jk4dt7wgam3lmpq6qakvu"'],
+    ['t-dim', 'token_contract  = "erd1qqqqqqqqqqqqqpgqvyz832uc7pfan2usyqq8ek9k8vf7xhtvlmpqsf73v7"'],
+    ['t-dim', 'escrow_contract = "erd1qqqqqqqqqqqqqpgq08hh9e5t57llh8p300hfdneqlxj80shzlmpq4f6qd6"'],
+    ['t-dim', 'anchor_contract = "erd1qqqqqqqqqqqqqpgqcy8ws6k9fthwfa9g67ksynvcfen7rdmglmpqpc7cl7"'],
+  ],
+  2: [
+    ['t-yellow t-bold', '▶ Pasul 2 — Emitere token fungibil $ECT și inițializare trezorerie'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Emit token-ul $ECT (EduChain Token)...'],
+    ['t-blue', 'ℹ  Aceasta este o operație ESDT system — costă 0.05 EGLD și durează ~5s'],
+    ['t-dim', '$ rust-interact token issue --name EduChainToken --ticker ECT --supply 10000000'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Mint recompense inițiale în trezorerie (1,000,000 ECT)...'],
+    ['t-dim', '$ rust-interact token mint-rewards --amount 1000000'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Verific soldul trezoreriei...'],
+    ['t-dim', '$ rust-interact token treasury-balance'],
+    ['t-white', '  treasury_balance: 1000000 ECT-f90acc'],
+    ['t-green', '✔  Token $ECT emis și trezorerie inițializată!'],
+  ],
+  3: [
+    ['t-cyan t-bold', '▶ Pasul 3 — Emitere certificat NFT (SBT) pentru student'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Fixture utilizat: interactor/fixtures/cert1.json'],
+    ['t-dim', '  {'],
+    ['t-dim', '    "student_address": "erd1...",'],
+    ['t-dim', '    "course": "Blockchain Engineering 101",'],
+    ['t-dim', '    "institution": "Universitatea Politehnica",'],
+    ['t-dim', '    "grade": "10",'],
+    ['t-dim', '    "issued_at": "2025-05-01"'],
+    ['t-dim', '  }'],
+    ['t-blue', 'ℹ  Fluxul de emitere:'],
+    ['t-dim', '  1. Citire fixture JSON'],
+    ['t-dim', '  2. Citire metadata JSON-LD off-chain'],
+    ['t-dim', '  3. Calcul SHA-256 al JSON-LD canonic (chei sortate)'],
+    ['t-dim', '  4. Construire CertificateAttributes cu content_hash'],
+    ['t-dim', '  5. Trimitere tranzacție issueCertificate pe Devnet'],
+    ['t-dim', '  6. NFT transferat automat în wallet-ul studentului'],
+    ['t-dim', '$ rust-interact nft issue --cert-file fixtures/cert1.json'],
+    ['t-white', '  content_hash: a3f8c2d91e4b5f6a7890abcdef1234567890abcdef1234567890abcdef12'],
+    ['t-white', '  nonce: 1 | collection: EDUCERT-a1b2c3'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Verific atributele certificatului emis (nonce=1)...'],
+    ['t-dim', '$ rust-interact nft verify --nonce 1'],
+    ['t-white', '  status: Valid | content_hash: a3f8c2d9... | student: erd1...'],
+    ['t-green t-bold', '✔  Certificat emis cu succes! SHA-256 al metadatelor stocat on-chain.'],
+  ],
+  4: [
+    ['t-green t-bold', '▶ Pasul 4 — Distribuire recompense $ECT către student'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Adresă student: erd1...cert1.json'],
+    ['t-dim', '$ rust-interact token add-distributor --addr erd1c3um...'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Adaug recompensă de 500 ECT pentru student (pentru absolvire)...'],
+    ['t-dim', '$ rust-interact token add-reward --to erd1... --amount 500 --reason "absolvire"'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Verific recompensa pending...'],
+    ['t-dim', '$ rust-interact token pending-balance --address erd1...'],
+    ['t-white', '  pending_balance: 500 ECT-f90acc'],
+    ['t-blue', 'ℹ  Studentul își revendică recompensa...'],
+    ['t-dim', '$ rust-interact token claim'],
+    ['t-white', '  claimed: 500 ECT-f90acc → erd1...student_wallet'],
+    ['t-green t-bold', '✔  Recompensele ECT au fost distribuite și revendicate!'],
+  ],
+  5: [
+    ['t-yellow t-bold', '▶ Pasul 5 — Sesiune de mentoring cu escrow $ECT'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Scenariu: Studentul plătește 200 ECT pentru o sesiune de mentoring'],
+    ['t-blue', 'ℹ  Mentor: erd1rdw0zvq...'],
+    ['t-dim', '  Flux:'],
+    ['t-dim', '  1. Student creează sesiunea (blochează 200 ECT în escrow)'],
+    ['t-dim', '  2. Sesiunea rămâne în starea Open pe durata mentoring-ului'],
+    ['t-dim', '  3. Studentul confirmă finalizarea → fonduri eliberate mentorului'],
+    ['t-blue', 'ℹ  Setez token ID-ul pentru escrow...'],
+    ['t-blue', 'ℹ  Creez sesiunea de mentoring (deadline: 72 ore)...'],
+    ['t-dim', '$ rust-interact escrow create --mentor erd1rdw... --amount 200 --deadline-hours 72'],
+    ['t-white', '  Session created! ID=0, mentor=erd1rdw..., amount=200 ECT, deadline=+72h'],
+    ['t-blue', 'ℹ  Verific starea sesiunii (ID=0)...'],
+    ['t-white', '  session[0]: status=Open | student=erd1... | mentor=erd1rdw... | amount=200 ECT'],
+    ['t-blue', 'ℹ  Studentul confirmă că sesiunea a fost finalizată...'],
+    ['t-dim', '$ rust-interact escrow confirm --id 0'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-white', '  session[0]: status=Completed | 200 ECT → erd1rdw... (mentor)'],
+    ['t-green t-bold', '✔  Escrow: 200 ECT transferați mentorului după confirmare!'],
+  ],
+  6: [
+    ['t-magenta t-bold', '▶ Pasul 6 — Ancorare hash document pe blockchain'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Anchorez raportul de validare TRL-4 E2...'],
+    ['t-blue', 'ℹ  Fișier: docs/EduChain_TRL4_E2_Validation_Report.md'],
+    ['t-dim', '  Fluxul de ancorare:'],
+    ['t-dim', '  1. Calcul SHA-256 al fișierului local'],
+    ['t-dim', '  2. Trimitere hash (32 bytes) + URI pe blockchain'],
+    ['t-dim', '  3. Hash stocat cu: autor, timestamp, URI, revoked=false'],
+    ['t-dim', '$ rust-interact anchor put --file ../docs/EduChain_TRL4_E2_Validation_Report.md'],
+    ['t-white', '  hash: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d906'],
+    ['t-white', '  anchored at block #4291847 | timestamp: 2025-05-06T14:32:11Z'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Hash SHA-256 local: 7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d906'],
+    ['t-blue', 'ℹ  Verific anchorul pe blockchain...'],
+    ['t-white', '  author: erd1c3um... | uri: docs/EduChain_TRL4... | revoked: false'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Test duplicat — încerc să anchorez același hash din nou...'],
+    ['t-red', '  Error: hash already anchored'],
+    ['t-green t-bold', '✔  Contractul a respins corect hash-ul duplicat!'],
+  ],
+  7: [
+    ['t-red t-bold', '▶ Pasul 7 — Revocare certificat (soft revoke)'],
+    ['t-dim', '────────────────────────────────────────────────────────────'],
+    ['t-blue', 'ℹ  Simulez revocarea certificatului cu nonce=1 (date eronate)...'],
+    ['t-dim', '  Nota: Soft revoke — NFT rămâne în wallet-ul studentului,'],
+    ['t-dim', '  dar verifyCertificate returnează status=Revoked.'],
+    ['t-dim', '$ rust-interact nft revoke --nonce 1 --reason "date eronate"'],
+    ['t-white', '  revoked nonce=1 | reason: date eronate | block: #4291901'],
+    ['t-green', '✔  Comandă executată cu succes (exit 0)'],
+    ['t-blue', 'ℹ  Verific statusul certificatului revocat...'],
+    ['t-dim', '$ rust-interact nft verify --nonce 1'],
+    ['t-white', '  status: Revoked | reason: date eronate | revoked_at: 2025-05-06T14:35:22Z'],
+    ['t-green t-bold', '✔  Certificatul a fost revocat. Status on-chain: Revoked.'],
+  ]
+};
+
+function simulateStep(stepNum) {
+  const output = stepOutputs[stepNum];
+  if (!output) return;
+
+  // Switch to demo tab
+  showTabProgrammatic('demo');
+
+  const terminal = document.getElementById('terminal-output');
+  terminal.innerHTML = '';
+
+  let delay = 0;
+  output.forEach(([cls, text]) => {
+    delay += 150;
+    setTimeout(() => {
+      const line = document.createElement('div');
+      line.className = cls.split(' ').join(' ');
+      line.style.cssText = `color: inherit;`;
+      // apply classes
+      cls.split(' ').forEach(c => {
+        if (c === 't-cyan') line.style.color = 'var(--cyan)';
+        else if (c === 't-green') line.style.color = 'var(--green)';
+        else if (c === 't-yellow') line.style.color = 'var(--yellow)';
+        else if (c === 't-red') line.style.color = 'var(--red)';
+        else if (c === 't-dim') line.style.color = 'var(--text-muted)';
+        else if (c === 't-white') line.style.color = 'var(--text)';
+        else if (c === 't-blue') line.style.color = 'var(--blue)';
+        else if (c === 't-magenta') line.style.color = 'var(--magenta)';
+        if (c === 't-bold') line.style.fontWeight = '700';
+      });
+      line.textContent = text;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }, delay);
+  });
+}
+
+function simulateAll() {
+  showTabProgrammatic('demo');
+  const terminal = document.getElementById('terminal-output');
+  terminal.innerHTML = '';
+
+  const banner = (msg) => [['t-cyan t-bold', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'],
+    ['t-cyan t-bold', '  ' + msg],
+    ['t-cyan t-bold', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'],
+    ['t-dim', '']
+  ];
+
+  let allLines = [
+    ...banner('🚀 EduChain PoC — Demo complet'),
+    ['t-dim', ''],
+  ];
+  for (let i = 1; i <= 7; i++) {
+    allLines = allLines.concat(stepOutputs[i] || []);
+    allLines.push(['t-dim', '']);
+  }
+  allLines = allLines.concat([
+    ...banner('🎉 Demo finalizat cu succes!'),
+    ['t-green', '  ✔ edu-chain-nft  — Emitere certificat SBT cu SHA-256 content_hash on-chain'],
+    ['t-green', '  ✔ ect-token       — Token fungibil $ECT, trezorerie, recompense, claim'],
+    ['t-green', '  ✔ ect-escrow      — Sesiune mentoring: blocare fonduri → confirmare → transfer'],
+    ['t-green', '  ✔ ect-anchor      — Ancorare SHA-256, verificare, respingere duplicat'],
+    ['t-green', '  ✔ Revocare         — Soft revoke certificat cu status on-chain'],
+  ]);
+
+  let delay = 0;
+  allLines.forEach(([cls, text]) => {
+    delay += 60;
+    setTimeout(() => {
+      const line = document.createElement('div');
+      cls.split(' ').forEach(c => {
+        if (c === 't-cyan') line.style.color = 'var(--cyan)';
+        else if (c === 't-green') line.style.color = 'var(--green)';
+        else if (c === 't-yellow') line.style.color = 'var(--yellow)';
+        else if (c === 't-red') line.style.color = 'var(--red)';
+        else if (c === 't-dim') line.style.color = 'var(--text-muted)';
+        else if (c === 't-white') line.style.color = 'var(--text)';
+        else if (c === 't-blue') line.style.color = 'var(--blue)';
+        else if (c === 't-magenta') line.style.color = 'var(--magenta)';
+        if (c === 't-bold') line.style.fontWeight = '700';
+      });
+      line.textContent = text;
+      terminal.appendChild(line);
+      terminal.scrollTop = terminal.scrollHeight;
+    }, delay);
+  });
+}
+
+function showTabProgrammatic(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  const idx = {contracts:0, demo:1, arch:2, setup:3}[name];
+  document.querySelectorAll('.tab-btn')[idx]?.classList.add('active');
+}
+</script>
+
+</body>
+</html>
