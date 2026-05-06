@@ -14,3 +14,10 @@ dex/erdjs-snippets/
 
 # ignore wallet files
 *.pem
+
+.DS_Store
+
+
+contracts/**/Cargo.lock
+!contracts/**/wasm*/Cargo.lock
+contracts/**/output*/
