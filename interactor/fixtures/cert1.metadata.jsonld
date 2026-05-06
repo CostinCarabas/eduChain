@@ -1,0 +1,40 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/credentials/v2",
+    "https://w3c-ccg.github.io/openbadges/v3p0"
+  ],
+  "id": "urn:educhain:cert:1",
+  "type": ["VerifiableCredential", "OpenBadgeCredential"],
+  "issuer": {
+    "id": "did:educhain:devmind",
+    "name": "Devmind Code"
+  },
+  "validFrom": "2024-10-27T00:00:00Z",
+  "validUntil": null,
+  "credentialSubject": {
+    "id": "erd1...",
+    "achievement": {
+      "id": "devmind-web3-v2",
+      "name": "Devmind Web3 Bootcamp v2",
+      "type": "Bootcamp",
+      "criteria": { "id": "https://devmind.code/programs/web3-v2/criteria" },
+      "alignment": [
+        { "targetFramework": "EQF", "targetCode": "6" }
+      ],
+      "skills": [
+        { "id": "http://data.europa.eu/esco/skill/S1", "name": "Smart contract development" },
+        { "id": "http://data.europa.eu/esco/skill/S2", "name": "Blockchain architecture" }
+      ]
+    },
+    "result": {
+      "resultType": "GradePointAverage",
+      "value": "95",
+      "ectsCredits": "12"
+    },
+    "evidence": [
+      { "id": "https://devmind.code/evidence/1", "type": "WorkProduct" }
+    ]
+  },
+  "instructor": { "name": "Ion Ionescu" },
+  "language": "ro"
+}

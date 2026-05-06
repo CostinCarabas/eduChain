@@ -1,7 +1,17 @@
+# EduChain Interactor Configuration — TRL-4 Etapa 2
+# ⚠ Do NOT commit real keys or secrets to git. Use the env key source.
 
-# chain_type = 'simulator'
-# gateway_uri = 'http://localhost:8085'
+chain_type  = "real"
+gateway_uri = "https://devnet-gateway.multiversx.com"
 
-chain_type = 'real'
-gateway_uri = 'https://devnet-gateway.multiversx.com'
+# Chain simulator (local testing):
+# chain_type  = "simulator"
+# gateway_uri = "http://localhost:8085"
 
+# Key source configuration
+[key]
+source  = "env"
+env_var = "EDUCHAIN_PEM"
+# Dev-only alternative (never commit the .pem file):
+# source    = "file"
+# file_path = "../eduChain.pem"

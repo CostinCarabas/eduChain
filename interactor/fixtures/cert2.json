@@ -1,0 +1,23 @@
+{
+  "student_address": "erd1c3umcqd2f8fx9q605vtqtm3pu8zawac3l96cmrnc35h7uzgvlmpqm3zsnr",
+  "token_name": "EDU-Cert #1",
+  "attrs": {
+    "certificate_version": 1,
+    "name": "Ana Popescu",
+    "program_name": "Devmind Web3 Bootcamp v2",
+    "grade": 95,
+    "credit_points": 30,
+    "creation_timestamp": 1730000000,
+    "expiration_timestamp": 0,
+    "course_id": "devmind-web3-v3",
+    "institution_name": "Devmind Code",
+    "instructor_name": "Ion Ionescu",
+    "verification_url": "https://verify.devmind.code/c/1",
+    "eqf_level": 6,
+    "ects_credits": 12,
+    "language": "ro",
+    "achievement_type": "Bootcamp",
+    "content_hash_hex": "auto"
+  },
+  "metadata_offchain_path": "fixtures/cert1.metadata.jsonld"
+}

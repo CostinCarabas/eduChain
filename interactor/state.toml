@@ -1,1 +1,5 @@
-contract_address = "erd1qqqqqqqqqqqqqpgqnqx4fl0fyg6ktfswssk0ysc0xswkrp65lmpqptjg70"
+nft_contract = "erd1qqqqqqqqqqqqqpgqtgc2tn999va6cpmgujcv3jk4dt7wgam3lmpq6qakvu"
+token_contract = "erd1qqqqqqqqqqqqqpgqvyz832uc7pfan2usyqq8ek9k8vf7xhtvlmpqsf73v7"
+escrow_contract = "erd1qqqqqqqqqqqqqpgq08hh9e5t57llh8p300hfdneqlxj80shzlmpq4f6qd6"
+anchor_contract = "erd1qqqqqqqqqqqqqpgqcy8ws6k9fthwfa9g67ksynvcfen7rdmglmpqpc7cl7"
+ect_token_id = "ECT-f90acc"
